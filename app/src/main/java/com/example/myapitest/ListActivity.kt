@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,12 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapitest.models.Car
 import com.example.myapitest.ui.theme.CarLocationAppTheme
 import com.squareup.picasso.Picasso
 
 class ListActivity : ComponentActivity() {
+    
+    private val viewModel: CarViewModel by viewModels()
+
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,17 +47,22 @@ class ListActivity : ComponentActivity() {
                         }
                     }
                 ) { innerPadding ->
-                    CarListScreen(modifier = Modifier.padding(innerPadding))
+                    CarListScreen(modifier = Modifier.padding(innerPadding), viewModel = viewModel)
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.fetchCars()
     }
 }
 
 @Composable
 fun CarListScreen(
     modifier: Modifier = Modifier,
-    viewModel: CarViewModel = viewModel()
+    viewModel: CarViewModel
 ) {
     val cars = viewModel.cars
     val isLoading = viewModel.isLoading
